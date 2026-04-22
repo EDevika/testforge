@@ -1,0 +1,4 @@
+anthropic
+pytest
+pytest-cov
+python-dotenv
