@@ -1,6 +1,6 @@
 import sys
 import os
-from src.parser import parse_python_file
+from src.parser import parse_file
 from src.generator import generate_tests
 from src.reviewer import review_test
 from src.logger import setup_database, log_session
@@ -20,7 +20,7 @@ def run_testforge(filepath):
 
     # Step 3: Parse the file
     print(f"\n  Reading: {filepath}")
-    functions = parse_python_file(filepath)
+    functions = parse_file(filepath)
 
     if not functions:
         print("  No functions found in this file.")
