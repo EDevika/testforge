@@ -1,3 +1,4 @@
+from src.logger import setup_database, log_session, show_report
 import sys
 import os
 from src.parser import parse_file
@@ -62,7 +63,10 @@ def run_testforge(filepath):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("\n  Usage: python main.py <path_to_python_file>")
-        print("  Example: python main.py src/calculator.py\n")
+        print("\n  Usage:")
+        print("    python main.py <file>     → generate tests")
+        print("    python main.py --report   → show acceptance report\n")
+    elif sys.argv[1] == "--report":
+        show_report()
     else:
         run_testforge(sys.argv[1])
