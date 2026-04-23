@@ -1,3 +1,4 @@
+# REWRITTEN (attempt 2) based on feedback: needs to test with a list input
 import pytest
 from src.grades import get_letter_grade
 
@@ -28,6 +29,10 @@ class Test_Get_letter_grade:
         """Test None input raises an error"""
         with pytest.raises((TypeError, ValueError)):
             get_letter_grade(None)
+    def test_get_letter_grade_with_list(self):
+        """Passing a list should raise TypeError"""
+        with pytest.raises(TypeError):
+            get_letter_grade([1, 2, 3, 4, 5])
 
 
 import pytest
@@ -37,7 +42,7 @@ class Test_Calculate_average:
 
     def test_calculate_average_normal(self):
         """Test normal input"""
-        result = calculate_average([1, 2, 3])
+        result = calculate_average([1,2,3])
         assert result == 2.0
 
     def test_calculate_average_with_zero(self):

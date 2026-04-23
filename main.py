@@ -2,7 +2,7 @@ from src.logger import setup_database, log_session, show_report
 import sys
 import os
 from src.parser import parse_file
-from src.generator import generate_tests
+from src.generator import generate_tests, regenerate_tests
 from src.reviewer import review_test
 from src.logger import setup_database, log_session
 
@@ -31,24 +31,46 @@ def run_testforge(filepath):
 
     # Step 4: For each function, generate → review → log
     accepted_tests = []
-
     for func in functions:
         print(f"\n  Generating tests for → {func['name']}()...")
-        
+
         generated = generate_tests(func, filepath)
+        attempt = 1
+        max_attempts = 3
 
-        result = review_test(func['name'], generated)
+        while attempt <= max_attempts:
+            result = review_test(func['name'], generated, attempt, max_attempts)
 
-        log_session(
-            function_name=func['name'],
-            accepted=result['accepted'],
-            was_edited=result.get('edited', False),
-            reason=result.get('reason', '')
-        )
+            if result['accepted']:
+                # Human approved — log and save
+                log_session(
+                    function_name=func['name'],
+                    accepted=True,
+                    was_edited=result.get('edited', False),
+                    reason=""
+                )
+                accepted_tests.append(result['test'])
+                break
 
-        if result['accepted']:
-            accepted_tests.append(result['test'])
+            else:
+                # Human rejected — log and retry
+                log_session(
+                    function_name=func['name'],
+                    accepted=False,
+                    was_edited=False,
+                    reason=result.get('reason', '')
+                )
 
+                if attempt < max_attempts:
+                    print(f"\n  🔄 Rewriting test based on your feedback...")
+                    print(f"  Feedback: {result['reason']}")
+                    generated = regenerate_tests(
+                        func, filepath, result['reason'], attempt + 1
+                    )
+                    attempt += 1
+                else:
+                    print(f"\n  ❌ Max attempts ({max_attempts}) reached for {func['name']}() — skipping.")
+                    break
     # Step 5: Save all accepted tests to one file
     if accepted_tests:
         filename = os.path.basename(filepath)
