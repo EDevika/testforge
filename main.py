@@ -34,7 +34,7 @@ def run_testforge(filepath):
     for func in functions:
         print(f"\n  Generating tests for → {func['name']}()...")
         
-        generated = generate_tests(func)
+        generated = generate_tests(func, filepath)
 
         result = review_test(func['name'], generated)
 
